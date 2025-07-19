@@ -1,3 +1,7 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿using ps_study.Chapters;
 
-Console.WriteLine("Hello, World!");
+// var chapter1 = new Chapter1();
+// chapter1.Run();
+
+var chapter2 = new Chapter2();
+chapter2.Run();
