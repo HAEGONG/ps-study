@@ -103,4 +103,32 @@ namespace ps_study.Chapters
             Console.WriteLine(count);
         }
     }
+    
+    class Chapter11_3 : BaseClass
+    {
+        protected override string SetTitle()
+        {
+            return "문자열 뒤집기 https://www.acmicpc.net/problem/1439";
+        }
+
+        protected override bool ShouldRun()
+        {
+            return true;
+        }
+
+        protected override void Example()
+        {
+            string input = Console.ReadLine();
+
+            int count = 0;
+            for (int i = 0; i < input.Length - 1; i++)
+            {
+                if (input[i] != input[i + 1])
+                    count++;
+            }
+
+            int result = (count + 1) / 2;
+            Console.WriteLine(result);
+        }
+    }
 }
