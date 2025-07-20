@@ -12,10 +12,8 @@ namespace ps_study.Chapters
             return true;
         }
 
-        public override void Run()
+        protected override void Example()
         {
-            base.Run();
-            
             int n = 1260;
             int count = 0;
 
@@ -43,10 +41,8 @@ namespace ps_study.Chapters
             return false;
         }
 
-        public override void Run()
+        protected override void Example()
         {
-            base.Run();
-            
             string input = Console.ReadLine();
             string[] numbers = input.Split(' ');
             int n = int.Parse(numbers[0]);
@@ -80,11 +76,9 @@ namespace ps_study.Chapters
         {
             return false;
         }
-        
-        public override void Run()
+
+        protected override void Example()
         {
-            base.Run();
-            
             string input = Console.ReadLine();
             string[] numbers = input.Split(' ');
             int n = int.Parse(numbers[0]);

@@ -4,13 +4,15 @@ namespace ps_study
     {
         protected abstract string SetTitle();
         protected abstract bool ShouldRun();
+        protected abstract void Example();
 
-        public virtual void Run()
+        public void Run()
         {
             if (!ShouldRun())
                 return;
             
             Console.WriteLine($"--- Example of: {SetTitle()} ---");
+            Example();
         }
     }
 }
