@@ -104,6 +104,67 @@ namespace ps_study.Chapters
         }
     }
     
+    class Chapter11_1 : BaseClass
+    {
+        protected override string SetTitle()
+        {
+            return "11-1 모험가 길드";
+        }
+
+        protected override bool ShouldRun()
+        {
+            return true;
+        }
+
+        protected override void Example()
+        {
+            string n = Console.ReadLine();
+            string m = Console.ReadLine();
+            int[] num = m.Split(' ').Select(int.Parse).Order().ToArray();
+
+            int result = 0;
+            int count = 0;
+
+            for (int i = 0; i < num.Length; i++)
+            {
+                count++;
+                if (count >= num[i])
+                {
+                    result++;
+                    count = 0;
+                }
+            }
+            
+            Console.WriteLine(result);
+        }
+    }
+    
+    class Chapter11_2 : BaseClass
+    {
+        protected override string SetTitle()
+        {
+            return "11-2 곱하기 혹은 더하기";
+        }
+        
+        protected override void Example()
+        {
+            string input = Console.ReadLine();
+
+            int result = 0;
+            
+            for (int i = 0; i < input.Length; i++)
+            {
+                int n = int.Parse(input[i].ToString());
+                if (result <= 1 || n <= 1)
+                    result = result + n;
+                else
+                    result = result * n;
+            }
+            
+            Console.WriteLine(result);
+        }
+    }
+
     class Chapter11_3 : BaseClass
     {
         protected override string SetTitle()

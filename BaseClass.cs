@@ -3,7 +3,11 @@ namespace ps_study
     public abstract class BaseClass
     {
         protected abstract string SetTitle();
-        protected abstract bool ShouldRun();
+
+        protected virtual bool ShouldRun()
+        {
+            return true;
+        }
         protected abstract void Example();
 
         public void Run()
