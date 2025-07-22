@@ -192,4 +192,62 @@ namespace ps_study.Chapters
             Console.WriteLine(result);
         }
     }
+
+    class Chapter11_4 : BaseClass
+    {
+        protected override string SetTitle()
+        {
+            return "11-4 만들 수 없는 금액";
+        }
+
+        protected override void Example()
+        {
+            int n = int.Parse(Console.ReadLine());
+            int[] coins = Console.ReadLine().Split(' ').Select(int.Parse).Order().ToArray();
+
+            int target = 1;
+
+            foreach (int coin in coins)
+            {
+                if (coin > target)
+                    break;
+                target = target + coin;
+            }
+            
+            Console.WriteLine(target);
+        }
+    }
+
+    class Chapter11_5 : BaseClass
+    {
+        protected override string SetTitle()
+        {
+            return "11-5 볼링공 고르기";
+        }
+
+        protected override void Example()
+        {
+            string nm = Console.ReadLine();
+            int n = int.Parse(nm.Split(' ')[0]);
+            int m = int.Parse(nm.Split(' ')[1]);
+
+            int[] balls = Console.ReadLine().Split(' ').Select(int.Parse).ToArray();
+            int[] ballCountByWeight = new int[m + 1];
+
+            foreach (int weight in balls)
+            {
+                ballCountByWeight[weight]++;
+            }
+
+            int result = 0;
+            
+            for (int i = 1; i <= m; i++)
+            {
+                n = n - ballCountByWeight[i];
+                result = result + ballCountByWeight[i] * n;
+            }
+            
+            Console.WriteLine(result);
+        }
+    }
 }
