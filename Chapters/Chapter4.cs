@@ -166,4 +166,105 @@ namespace ps_study.Chapters
             Console.WriteLine(strPart + numPart);
         }
     }
+    
+    class Chapter12_5 : BaseClass
+    {
+        protected override string SetTitle()
+        {
+            return "12-5 뱀";
+        }
+
+        enum Status
+        {
+            empty,
+            apple,
+        }
+
+        // 동 남 서 북
+        int[] dx = {0, 1, 0, -1};
+        int[] dy = {1, 0, -1, 0};
+        private int dir = 0;
+        private void Turn(char C)
+        {
+            if (C == 'L')
+            {
+                dir--;
+            } else if (C == 'D')
+            {
+                dir++;
+            }
+
+            if (dir < 0)
+                dir = 3;
+            else if (dir > 3)
+                dir = 0;
+        }
+
+        protected override void Example()
+        {
+            int N = int.Parse(Console.ReadLine());
+            Status[,] board = new Status[N + 1, N + 1];
+            
+            int K = int.Parse(Console.ReadLine());
+
+            for (int i = 0; i < K; i++)
+            {
+                string input = Console.ReadLine();
+                int[] xy = input.Split(' ').Select(int.Parse).ToArray();
+                int x = xy[0];
+                int y = xy[1];
+                board[x, y] = Status.apple;
+            }
+            
+            int L = int.Parse(Console.ReadLine());
+
+            (int X, char C)[] commands = new (int X, char C)[L];
+
+            for (int i = 0; i < L; i++)
+            {
+                string[] input = Console.ReadLine().Split(" ");
+                commands[i] = (int.Parse(input[0]), input[1][0]);
+            }
+
+            (int x, int y) currentPos = (1, 1);
+
+            int countSec = 0;
+            int countCommand = 0;
+            Queue<(int x, int y)> snake = new Queue<(int x, int y)>();
+            snake.Enqueue((1, 1));
+            
+            while (true)
+            {
+                (int x, int y) newPos = (currentPos.x + dx[dir], currentPos.y + dy[dir]);
+
+                if (newPos.x < 1 || newPos.x > N || newPos.y < 1 || newPos.y > N || snake.Contains(newPos))
+                {
+                    countSec++;
+                    break;
+                }
+
+                if (board[newPos.x, newPos.y] == Status.apple)
+                {
+                    board[newPos.x, newPos.y] = Status.empty;
+                    snake.Enqueue(newPos);
+                    currentPos = newPos;
+                } else if (board[newPos.x, newPos.y] == Status.empty)
+                {
+                    snake.Dequeue();
+                    snake.Enqueue(newPos);
+                    currentPos = newPos;
+                }
+
+                countSec++;
+
+                if (countCommand < L && commands[countCommand].X == countSec)
+                {
+                    Turn(commands[countCommand].C);
+                    countCommand++;
+                }
+            }
+            
+            Console.WriteLine(countSec);
+        }
+    }
 }
