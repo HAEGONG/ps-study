@@ -167,3 +167,75 @@ sealed class Dog : Animal
     }
 }
 ```
+
+## 명시적 인터페이스 구현
+```C#
+public class SampleClass : IControl, ISurface
+{
+    void IControl.Paint()
+    {
+        System.Console.WriteLine("IControl.Paint");
+    }
+    void ISurface.Paint()
+    {
+        System.Console.WriteLine("ISurface.Paint");
+    }
+}
+```
+
+## Type 변환(Convert Class)
+```C#
+byte[] bytes = {1, 2, 3};
+string base64String = Convert.ToBase64String(bytes);
+Console.WriteLine(base64String);
+```
+
+## Type 변환(is)
+```C#
+object obj = "Hello";
+if (obj is string str)
+{
+    Console.WriteLine(str);
+}
+```
+
+## 제네릭 제약조건
+```C#
+void Swap<T>(ref T a, ref T b) 
+    where T : class // or struct
+{
+    T temp = a;
+    a = b;
+    b = temp;
+}
+
+
+
+```
+new 제약 조건은 제네릭 클래스 또는 메서드 선언의 형식 인수에 매개 변수가 없는 공용 생성자가 있어야 함을 지정
+```C#
+void CreateInstance<T, T2>(out T a, out T2 b)
+    where T : class, new() // new 제약조건
+    where T2 : class, new()
+{
+    a = new T();
+    b = new T2();
+}
+
+T CreateInstance<T>() 
+    where T : class, new()
+{
+    return new T();
+}
+
+var animal = CreateInstance<Dog>();
+```
+```C#
+T CreateInstance<T>() 
+    where T : IAnimal, new() // 인터페이스 제약조건
+{
+    T instance = new T();
+    instance.Bark();
+    return instance;
+}
+```
