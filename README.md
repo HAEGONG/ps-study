@@ -239,3 +239,58 @@ T CreateInstance<T>()
     return instance;
 }
 ```
+
+## 대리자(Func)
+반환값이 있는 메서드 캡슐화
+```C#
+// Func의 마지막 타입이 반환값, 나머지 타입들은 매개변수의 타입
+void ApplyOperation(int x, int y, Func<int, int, int> operation)
+{
+    int result = operation(x, y);
+    Console.WriteLine(result);
+}
+
+ApplyOperation(1, 2, Add);
+
+int Add(int x, int y) => x + y;
+```
+
+## 대리자(Action)
+반환값이 없는 메서드 캡슐화
+```C#
+void ActionMethod(String s, int i)
+{
+    Console.WriteLine(s + i);
+}
+
+Action<string, int> action = ActionMethod;
+action.Invoke("Hello", 123);
+```
+
+## 대리자(Predicate)
+조건에 따라 bool값을 반환하는 메서드 캡슐화
+```C#
+bool IsGreaterThanZero(int value)
+{
+    return value > 0;
+}
+
+Predicate<int> predicate = IsGreaterThanZero;
+bool result = predicate.Invoke(1);
+Console.WriteLine(result);
+    
+```
+
+## 대리자(Comparison)
+두 값을 비교하고 정렬 순서를 나타내는 int 반환
+```C#
+int Compare(int x, int y)
+{
+    return x.CompareTo(y);
+}
+
+Comparison<int> comparison = Compare;
+Console.WriteLine(comparison(6, 2)); // 1
+Console.WriteLine(comparison(2, 2)); // 0
+Console.WriteLine(comparison(1, 4)); // -1
+```
