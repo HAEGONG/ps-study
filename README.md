@@ -294,3 +294,108 @@ Console.WriteLine(comparison(6, 2)); // 1
 Console.WriteLine(comparison(2, 2)); // 0
 Console.WriteLine(comparison(1, 4)); // -1
 ```
+
+## 열거자(Enumerator)
+컬렉션을 순회(iterate) 할 수 있게 해주는 객체  
+주로 IEnumerable과 IEnumerator 인터페이스를 통해 구현
+```C#
+IEnumerator<int> GetEnumerator()
+{
+    yield return 1;
+    yield return 2;
+    yield return 3;
+}
+
+var enumerator = GetEnumerator();
+while (enumerator.MoveNext())
+{
+    Console.Write(enumerator.Current + " "); // 1 2 3
+}
+```
+```C#
+Collection collection = new Collection();
+
+foreach (int value in collection)
+{
+    Console.WriteLine(value);
+}
+
+class Collection
+{
+    // 함수명은 반드시 GetEnumerator 가 되어야함
+    public IEnumerator<int> GetEnumerator()
+    {
+        yield return 1;
+        yield return 2;
+        yield return 3;
+    }
+}
+```
+
+## 열거자(Enumerable)
+```C#
+IEnumerable<int> GetEnumerable()
+{
+    yield return 1;
+    yield return 2;
+    yield return 3;
+}
+
+var enumerable = GetEnumerable();
+foreach (var value in enumerable)
+{
+    Console.WriteLine(value);
+}
+
+var enumerator = enumerable.GetEnumerator();
+enumerator.MoveNext();
+int i = enumerator.Current;
+```
+
+## 컬렉션(List)
+```C#
+var stringList = new List<string> {"a", "b", "c"};
+List<string> stringList2 = ["가", "나", "다"]; // 컬렉션 표현식
+
+// 요소 삽입
+stringList.AddRange(stringList2);
+stringList.Insert(1, "z");
+stringList.InsertRange(2, stringList2);
+
+// 요소 삭제
+stringList.Remove("b");
+stringList.RemoveAt(3);
+stringList.RemoveAll(str =>
+{
+    return str == "a" || str == "c";  
+});
+stringList.Clear();
+
+// 요소 검색
+stringList = ["apple", "lemon", "lime"];
+bool hasData = stringList.Contains("apple");
+bool hasData2 = stringList.Contains("APPLE", StringComparer.OrdinalIgnoreCase);
+
+int index = stringList.IndexOf("lemon"); // 1
+int index2 = stringList.IndexOf("LEMON"); // -1
+
+//Find: 조건에 맞는 첫번째 요소 반환
+string? selected = stringList.Find(fruit =>
+{
+    return fruit.StartsWith("l");
+});
+// FindAll: 조건에 맞는 모든 요소 반환
+List<string> selectedList = stringList.FindAll(fruit =>
+{
+    return fruit.StartsWith("l");
+});
+
+// 정렬
+List<int> intList = [3, 1, 6];
+intList.Reverse(); // 6, 1, 3
+intList.Sort(); // 1, 3, 6
+intList.Sort((a, b) => b.CompareTo(a)); // 6, 3, 1
+
+int count = intList.Count();
+int[] ints = intList.ToArray(); // 배열로 변환
+```
