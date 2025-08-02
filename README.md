@@ -382,12 +382,12 @@ int index2 = stringList.IndexOf("LEMON"); // -1
 //Find: 조건에 맞는 첫번째 요소 반환
 string? selected = stringList.Find(fruit =>
 {
-    return fruit.StartsWith("l");
+    return fruit.StartsWith("l"); // lemon
 });
 // FindAll: 조건에 맞는 모든 요소 반환
 List<string> selectedList = stringList.FindAll(fruit =>
 {
-    return fruit.StartsWith("l");
+    return fruit.StartsWith("l"); // [lemon, lime]
 });
 
 // 정렬
@@ -398,4 +398,81 @@ intList.Sort((a, b) => b.CompareTo(a)); // 6, 3, 1
 
 int count = intList.Count();
 int[] ints = intList.ToArray(); // 배열로 변환
+```
+
+# Linq
+```C#
+List<int> numbers = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+
+// Transformation
+var doubled = numbers.Select(n => n * 2); // [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
+var numberObjects = numbers.Select(n => new { Value = n, IsEven = n % 2 == 0 });
+// 위에 방법은 익명타입을 만들어서 method 내에서 구조화할 수 없음
+// 새로운 클래스를 만들거나 아래처럼 튜플을 만드는 방법이 대안
+var numberObjects2 = numbers.Select(n => (Value: n, IsEven: n % 2 == 0 ));
+
+// Filtering
+var evens = numbers.Where(n => n % 2 == 0); // [2, 4, 6, 8, 10]
+var odds = from n in numbers 
+    let isOdd = n % 2 != 0 
+    where isOdd 
+    select n; // [1, 3, 5, 7, 9]
+
+// Ordering
+var ascending = numbers.OrderBy(n => n); // [1, 2, 3, ...]
+var descending = numbers.OrderByDescending(n => n); // [10, 9, 8, ...]
+var complex = numbers.OrderBy(n => n % 3).ThenByDescending(n => n); // [9, 6, 3, 10, 7, 4, 1, 8, 5, 2]
+// n % 3 == 0: 3, 6, 9 → 내림차순 → 9, 6, 3
+// n % 3 == 1: 1, 4, 7, 10 → 내림차순 → 10, 7, 4, 1
+// n % 3 == 2: 2, 5, 8 → 내림차순 → 8, 5, 2
+
+// Grouping
+var groups = numbers.GroupBy(n => n % 3); // 3으로 나누고 나머지값이 같은 숫자 끼리 묶임
+foreach (var group in groups)
+{
+    Console.WriteLine($"Remainder {group.Key}: {string.Join(", ", group)}");
+    // Remainder 1: 1, 4, 7, 10
+    // Remainder 2: 2, 5, 8
+    // Remainder 0: 3, 6, 9
+}
+var flattenGroup = groups.SelectMany(n => n); // [1, 4, 7, 10, 2, 5, 8, 3, 6, 9] flatMap
+
+// Join
+var result = from student in students
+             join score in studentScores
+             on students.Id equals score.StudentId
+             select (student, score);
+var result = students.Join(
+        studentScores,
+        student => student.Id,
+        score => score.StudentId,
+        (student, score) => (student, score));
+
+// Aggregation
+int sum = numbers.Sum();            // 55
+int min = numbers.Min();            // 1
+int max = numbers.Max();            // 10
+double average = numbers.Average(); // 5.5
+int sum2 = numbers.Aggregate((a, b) => a + b); // 55
+int product = numbers.Aggregate((a, b) => a * b); // 3628800 (factorial of 10)
+
+// Quantifiers
+bool allEven = numbers.All(n => n % 2 == 0); // false
+bool anyEven = numbers.Any(n => n % 2 == 0); // true
+bool containsFive = numbers.Contains(5);     // true
+
+// Partitioning
+var firstThree = numbers.Take(4);     // [1, 2, 3, 4]
+var skipFirstThree = numbers.Skip(5); // [6, 7, 8, 9, 10]
+var takeLast = numbers.TakeLast(2);   // [9, 10]
+var skipLast = numbers.SkipLast(2);   // [1, 2, 3, 4, 5, 6, 7, 8]
+
+// Element operations
+int first = numbers.First(); // 1
+int firstEven = numbers.First(n => n % 2 == 0); // 2
+int lastOdd = numbers.Last(n => n % 2 != 0);    // 9
+
+// 시퀀스에서 지정된 조건에 맞는 유일한 요소를 반환하고
+// 이러한 요소가 둘 이상 있거나 없으면 예외를 throw
+int single = numbers.Where(n => n == 5).Single(); // 5
 ```
