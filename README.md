@@ -454,7 +454,7 @@ int min = numbers.Min();            // 1
 int max = numbers.Max();            // 10
 double average = numbers.Average(); // 5.5
 int sum2 = numbers.Aggregate((a, b) => a + b); // 55
-int product = numbers.Aggregate((a, b) => a * b); // 3628800 (factorial of 10)
+int product = numbers.Aggregate((a, b) => a * b); // 3628800 10!(팩토리얼)
 
 // Quantifiers
 bool allEven = numbers.All(n => n % 2 == 0); // false
@@ -475,4 +475,178 @@ int lastOdd = numbers.Last(n => n % 2 != 0);    // 9
 // 시퀀스에서 지정된 조건에 맞는 유일한 요소를 반환하고
 // 이러한 요소가 둘 이상 있거나 없으면 예외를 throw
 int single = numbers.Where(n => n == 5).Single(); // 5
+```
+
+## Thread
+```C#
+Console.WriteLine(Thread.CurrentThread.ManagedThreadId); // 현재 스레드 ID를 반환
+
+void DoWork() => Console.WriteLine("DoWork");
+
+Thread thread = new Thread(new ThreadStart(DoWork)); // 스레드 생성
+Thread thread2 = new Thread(DoWork);                 // 스레드 생성
+
+thread.Start(); // 스레드 실행
+
+bool isThreadAlive = thread.IsAlive;
+thread.Interrupt(); // 스레드 중단요청 try catch로 에러 처리 가능
+thread.Join(); // 이 인스턴스가 나타내는 스레드가 종료될 때까지 호출 스레드를 차단
+```
+
+### 임계영역 lock
+```C#
+int data = 0;
+object lockObj = new object();
+void DoWork2()
+{
+    for (int i = 0; i < 100; i++)
+    {
+        lock (lockObj) // 임계 영역(Critical Section) 설정
+        {
+            Thread.Sleep(1);
+            data++;
+        }
+    }
+}
+```
+
+### 임계영역 Monitor
+```C#
+int data = 0;
+object lockObj = new object();
+void DoWork3()
+{
+    for (int i = 0; i < 100; i++)
+    {
+        Monitor.Enter(lockObj); // 임계 영역 시작지점
+        Thread.Sleep(1);
+        data++;
+        Monitor.Exit(lockObj); // 임계 영역 종료지점
+    }
+}
+
+Monitor.Wait(lockObj); // pulse 신호 대기
+Monitor.Pulse(lockObj); // 대기 중인 스레드에 알림
+```
+
+### 임계영역 Mutex
+```C#
+class Program
+{
+    static void Main(string[] args)
+    {
+        // 동일한 뮤텍스 이름
+        const string mutexName = "Global\\MyUniqueMutex";
+
+        // 뮤텍스 점유 시도
+        using (var mutex = new Mutex(false, mutexName, out bool isCreatedNew))
+        {
+            if (isCreatedNew)
+                Console.WriteLine("뮤텍스를 새로 생성했습니다. 프로그램이 MutexCreator를 대신 점유합니다.");
+            else
+                Console.WriteLine("MutexCreator가 실행 중입니다. 뮤텍스를 기다립니다...");
+
+            // 뮤텍스 점유를 기다림
+            try
+            {
+                mutex.WaitOne();
+                Console.WriteLine("뮤텍스를 점유했습니다!");
+            }
+            catch (AbandonedMutexException)
+            { Console.WriteLine("뮤텍스가 포기된 상태에서 점유되었습니다."); }
+
+            // 프로그램 실행 대기 (예: 10초 동안 점유 유지)
+            Console.WriteLine("뮤텍스를 유지하며 실행 중입니다. 10초 후 종료합니다.");
+            Thread.Sleep(10000);
+
+            // 뮤텍스 점유 해제
+            mutex.ReleaseMutex();
+            Console.WriteLine("뮤텍스를 해제했습니다.");
+        }
+    }
+}
+```
+
+### 임계영역 semaphore
+```C#
+class Program
+{
+    // SemaphoreSlim 생성: 2개의 스레드만 동시에 접근 가능(최대 6개 까지 가능)
+    static SemaphoreSlim semaphoreSlim = new SemaphoreSlim(2, 6);
+
+    static void Main(string[] args)
+    {
+        Console.WriteLine("SemaphoreSlim 동기 예제 시작!");
+        // 입장권 추가
+        semaphoreSlim.Release(2);
+
+        // 여러 스레드 생성
+        Thread[] threads = new Thread[10];
+        for (int i = 1; i <= 10; i++)
+        {
+            int threadId = i; // 고유 ID 캡처
+            threads[i - 1] = new Thread(AccessSharedResource);
+            threads[i - 1].Start(threadId);
+        }
+
+        // 모든 스레드가 완료될 때까지 대기
+        foreach (var thread in threads)
+        {
+            thread?.Join();
+        }
+
+        Console.WriteLine("모든 스레드 작업 완료!");
+    }
+
+    static void AccessSharedResource(object? id)
+    {
+        Console.WriteLine($"스레드 {id} - 공유 자원 접근 시도 중...");
+
+        // 임계영역 진입 요청
+        semaphoreSlim.Wait(); // 동기 방식으로 잠금 요청
+        try
+        {
+            Console.WriteLine($"스레드 {id} - 공유 자원에 접근!");
+
+            // 공유 자원 작업(예: 파일 쓰기, DB 작업 등)
+            Thread.Sleep(2000); // 작업 중인 상태를 시뮬레이션
+        }
+        finally
+        {
+            // 반드시 Release를 호출하여 잠금 해제
+            Console.WriteLine($"스레드 {id} - 공유 자원 작업 완료.");
+            semaphoreSlim.Release();
+        }
+    }
+}
+```
+
+## ThreadPool
+* 생성방식 : 시스템에서 관리하는 풀에서 스레드 재사용
+* 비용 : 스레드 재사용으로 비용이 낮음
+* 제한 : 풀에 설정된 최대 스레드 개수 제한 있음
+* 유지관리 : .NET 런타임이 자동으로 관리
+* 다수의 짧고 반복적인 작업에 적합
+```C#
+class Program
+{
+    static void Main(string[] args)
+    {
+        Console.WriteLine("쓰레드 예제 시작!");
+
+        for (int i = 1; i <= 5; i++)
+        {
+            //Thread thread = new Thread(() => DoWork());
+            //thread.Start();
+            ThreadPool.QueueUserWorkItem(state => DoWork());
+        }
+    }
+    
+    static void DoWork()
+    {
+        Console.WriteLine($"[ThreadPool {Thread.CurrentThread.ManagedThreadId}] 작업 시작");
+        Thread.Sleep(2000); // 작업 시뮬레이션
+        Console.WriteLine($"[ThreadPool {Thread.CurrentThread.ManagedThreadId}] 작업 완료");
+    }
+}
 ```
