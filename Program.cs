@@ -1,4 +1,6 @@
-﻿using ps_study.Chapters;
+﻿using System.Text;
+using ps_study;
+using ps_study.Chapters;
 
 // new Chapter3_1().Run();
 // new Chapter3_2().Run();
@@ -15,3 +17,7 @@
 // new Chapter12_1().Run();
 // new Chapter12_2().Run();
 // new Chapter12_5().Run();
+
+// new Chapter5_DFS().Run();
+// new Chapter5_BFS().Run();
+// new Chapter5_1().Run();
