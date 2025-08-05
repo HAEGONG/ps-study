@@ -266,3 +266,106 @@ class Chapter13_1 : BaseClass
         }
     }
 }
+
+class Chapter13_2 : BaseClass
+{
+    protected override string SetTitle()
+    {
+        return "백준 14502 연구소";
+    }
+    
+    int[] dx = [1, 0, -1, 0];
+    int[] dy = [0, 1, 0, -1];
+    List<(int, int)> emptySpaces = new List<(int, int)>();
+    List<(int, int)> virusSpaces = new List<(int, int)>();
+    int[,] map;
+    int[] NM;
+    int result = 0;
+
+    protected override void Example()
+    {
+        NM = Console.ReadLine()!.Split().Select(int.Parse).ToArray();
+        
+        map = new int[NM[0], NM[1]];
+        
+        for (int i = 0; i < NM[0]; i++)
+        {
+            int[] input = Console.ReadLine()!.Split().Select(int.Parse).ToArray();
+            for (int j = 0; j < NM[1]; j++)
+            {
+                map[i, j] = input[j];
+                
+                if (map[i, j] == 0)
+                    emptySpaces.Add((i, j));
+                if (map[i, j] == 2)
+                    virusSpaces.Add((i, j));
+            }
+        }
+        
+        BuildWalls(0, 0);
+        Console.WriteLine(result);
+    }
+
+    void BuildWalls(int wallCount, int start)
+    {
+        if (wallCount == 3)
+        {
+            int[,] tempMap = new int[NM[0], NM[1]];
+            for (int i = 0; i < NM[0]; i++)
+            {
+                for (int j = 0; j < NM[1]; j++)
+                {
+                    tempMap[i, j] = map[i, j];
+                }
+            }
+            foreach (var (x, y) in virusSpaces)
+            {
+                SpreadVirus(x, y, tempMap);
+            }
+            
+            result = Math.Max(result, CountSafeArea(tempMap));
+            
+            return;
+        }
+
+        for (int i = start; i < emptySpaces.Count; i++)
+        {
+            var (x, y) = emptySpaces[i];
+            map[x, y] = 1;
+            BuildWalls(wallCount + 1, i + 1);
+            map[x, y] = 0;
+        }
+    }
+
+    void SpreadVirus(int x, int y, int[,] tempMap)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            int nx = x + dx[i];
+            int ny = y + dy[i];
+            
+            if (nx < 0 || ny < 0 || nx >= NM[0] || ny >= NM[1])
+                continue;
+
+            if (tempMap[nx, ny] == 0)
+            {
+                tempMap[nx, ny] = 2;
+                SpreadVirus(nx, ny, tempMap);
+            }
+        }
+    }
+
+    int CountSafeArea(int[,] tempMap)
+    {
+        int count = 0;
+        for (int i = 0; i < tempMap.GetLength(0); i++)
+        {
+            for (int j = 0; j < tempMap.GetLength(1); j++)
+            {
+                if (tempMap[i, j] == 0)
+                    count++;
+            }
+        }
+        return count;
+    }
+}
