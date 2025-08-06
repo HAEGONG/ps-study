@@ -369,3 +369,81 @@ class Chapter13_2 : BaseClass
         return count;
     }
 }
+
+class Chapter13_3 : BaseClass
+{
+    protected override string SetTitle()
+    {
+        return "백준 18405 경쟁적 전염";
+    }
+
+    int[] dx = { 1, 0, -1, 0 };
+    int[] dy = { 0, 1, 0, -1 };
+
+    class Virus
+    {
+        public int x;
+        public int y;
+        public int virusNum;
+        public int second;
+
+        public Virus((int x, int y) pos, int virusNum, int second)
+        {
+            this.x = pos.x;
+            this.y = pos.y;
+            this.virusNum = virusNum;
+            this.second = second;
+        }
+    }
+
+    protected override void Example()
+    {
+        int[] nm = Console.ReadLine()!.Split().Select(Int32.Parse).ToArray();
+        int[,] map = new int[nm[0], nm[1]];
+        var pq = new PriorityQueue<Virus, (int, int)>();
+
+        for (int i = 0; i < nm[0]; i++)
+        {
+            int[] input = Console.ReadLine()!.Split().Select(Int32.Parse).ToArray();
+            for (int j = 0; j < input.Length; j++)
+            {
+                map[i, j] = input[j];
+
+                if (map[i, j] != 0)
+                {
+                    pq.Enqueue(new Virus((i, j), map[i, j], 0), (0, map[i, j]));
+                }
+            }
+        }
+        
+        int[] SXY = Console.ReadLine()!.Split().Select(Int32.Parse).ToArray();
+
+        int second = 0;
+        while (pq.Count > 0)
+        {
+            if (second == SXY[0])
+                break;
+            
+            var virus = pq.Dequeue();
+            for (int i = 0; i < 4; i++)
+            {
+                int nx = virus.x + dx[i];
+                int ny = virus.y + dy[i];
+                
+                if (nx < 0 || ny < 0 || nx >= nm[0] || ny >= nm[1])
+                    continue;
+
+                if (map[nx, ny] == 0)
+                {
+                    map[nx, ny] = virus.virusNum;
+                    pq.Enqueue(new Virus((nx, ny), virus.virusNum, virus.second + 1), (virus.second + 1, virus.virusNum));
+                }
+            }
+
+            if (second <= virus.second)
+                second++;
+        }
+        
+        Console.WriteLine(map[SXY[1] - 1, SXY[2] - 1]);
+    }
+}
