@@ -510,3 +510,112 @@ class Chapter13_5 : BaseClass
         }
     }
 }
+
+class Chapter13_6 : BaseClass
+{
+    protected override string SetTitle()
+    {
+        return "백준 18428 감시 피하기";
+    }
+
+    private int N;
+    private char[,] map;
+    private List<(int, int)> teachers = new List<(int, int)>();
+    private List<(int, int)> emptySpaces = new List<(int, int)>();
+    bool canEscape = false;
+    bool watchStudent = false;
+    
+    int[] dx = { 1, 0, -1, 0 };
+    int[] dy = { 0, 1, 0, -1 };
+
+    protected override void Example()
+    {
+        N = int.Parse(Console.ReadLine()!);
+
+        map = new char[N, N];
+        
+        for (int i = 0; i < N; i++)
+        {
+            char[] input = Console.ReadLine()!.Split().Select(char.Parse).ToArray();
+            for (int j = 0; j < N; j++)
+            {
+                map[i, j] = input[j];
+                if (map[i, j] == 'T')
+                {
+                    teachers.Add((i, j));
+                }
+                else if (map[i, j] == 'X')
+                {
+                    emptySpaces.Add((i, j));
+                }
+            }
+        }
+        
+        BuildWalls(0, 0);
+        Console.WriteLine(canEscape ? "YES" : "NO");
+    }
+
+    void BuildWalls(int wallCount, int start)
+    {
+        if (canEscape) return;
+        if (wallCount == 3)
+        {
+            watchStudent = false;
+            foreach (var (x, y) in teachers)
+            {
+                if (IsStudentVisible(x, y))
+                {
+                    watchStudent = true;
+                    break;
+                }
+            }
+            
+            if (!watchStudent)
+                canEscape = true;
+            
+            return;
+        }
+
+        for (int i = start; i < emptySpaces.Count; i++)
+        {
+            var (x, y) = emptySpaces[i];
+            map[x, y] = 'O';
+            BuildWalls(wallCount + 1, i + 1);
+            map[x, y] = 'X';
+        }
+    }
+    
+    bool IsStudentVisible(int x, int y)
+    {
+        
+        for (int i = 0; i < 4; i++)
+        {
+            int currentX = x;
+            int currentY = y;
+            
+            while (true)
+            {
+                int nx = currentX + dx[i];
+                int ny = currentY + dy[i];
+
+                if (nx < 0 || ny < 0 || nx >= N || ny >= N)
+                    break;
+
+                currentX = nx;
+                currentY = ny;
+                
+                if (map[nx, ny] == 'O')
+                {
+                    break;
+                }
+                
+                if (map[nx, ny] == 'S')
+                {
+                    return true;
+                } 
+            }
+        }
+
+        return false;
+    }
+}
