@@ -447,3 +447,66 @@ class Chapter13_3 : BaseClass
         Console.WriteLine(map[SXY[1] - 1, SXY[2] - 1]);
     }
 }
+
+class Chapter13_5 : BaseClass
+{
+    protected override string SetTitle()
+    {
+        return "백준 14888 연산자 끼워 넣기";
+    }
+
+    private int N;
+    private int[] numbers;
+    private int[] operators;
+    
+    int resultMin = int.MaxValue;
+    int resultMax = int.MinValue;
+
+    protected override void Example()
+    {
+        N = int.Parse(Console.ReadLine()!);
+        numbers = Console.ReadLine()!.Split().Select(int.Parse).ToArray();
+        operators = Console.ReadLine()!.Split().Select(int.Parse).ToArray();
+
+        Solve(1, numbers[0]);
+        
+        Console.WriteLine(resultMax);
+        Console.WriteLine(resultMin);
+    }
+
+    private void Solve(int numIndex, int currentResult)
+    {
+        if (numIndex == N)
+        {
+            resultMin = Math.Min(resultMin, currentResult);
+            resultMax = Math.Max(resultMax, currentResult);
+            return;
+        }
+
+        for (int i = 0; i < 4; i++)
+        {
+            if (operators[i] > 0)
+            {
+                operators[i]--;
+
+                switch (i)
+                {
+                    case 0:
+                        Solve(numIndex + 1, currentResult + numbers[numIndex]);
+                        break;
+                    case 1:
+                        Solve(numIndex + 1, currentResult - numbers[numIndex]);
+                        break;
+                    case 2:
+                        Solve(numIndex + 1, currentResult * numbers[numIndex]);
+                        break;
+                    case 3:
+                        Solve(numIndex + 1, currentResult / numbers[numIndex]);
+                        break;
+                }
+                
+                operators[i]++;
+            }
+        }
+    }
+}
