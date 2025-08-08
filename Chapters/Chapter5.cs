@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+
 namespace ps_study.Chapters;
 
 public class Chapter5_DFS : BaseClass
@@ -617,5 +619,133 @@ class Chapter13_6 : BaseClass
         }
 
         return false;
+    }
+}
+
+class Chapter13_7 : BaseClass
+{
+    protected override string SetTitle()
+    {
+        return "백준 16234 인구 이동";
+    }
+
+    private int N, L, R;
+    private int[,] populationMap;
+    
+    int[] dx = { 1, 0, -1, 0 };
+    int[] dy = { 0, 1, 0, -1 };
+
+    private int days = 0;
+    private bool isMovementOccurred = false;
+    
+    protected override void Example()
+    {
+        int[] NLR = Console.ReadLine()!.Split().Select(int.Parse).ToArray();
+        N = NLR[0];
+        L = NLR[1];
+        R = NLR[2];
+        
+        populationMap = new int[N, N];
+
+        for (int i = 0; i < N; i++)
+        {
+            int[] input = Console.ReadLine()!.Split().Select(int.Parse).ToArray();
+            for (int j = 0; j < N; j++)
+            {
+                populationMap[i, j] = input[j];
+            }
+        }
+
+        while (true)
+        {
+            isMovementOccurred = SimulateOneDay();
+            if (isMovementOccurred)
+            {
+                days++;
+            }
+            else
+            {
+                break;
+            }
+        }
+        
+        Console.WriteLine(days);
+    }
+
+    bool ShouldOpenBorder(int x1, int y1, int x2, int y2)
+    {
+        if (MathF.Abs(populationMap[x1, y1] - populationMap[x2, y2]) >= L && MathF.Abs(populationMap[x1, y1] - populationMap[x2, y2]) <= R)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    bool SimulateOneDay()
+    {
+        bool movementOccurredThisDay = false;
+        bool[,] visited = new bool[N, N];
+        List<List<(int, int)>> allUnions = new List<List<(int, int)>>();
+
+        for (int i = 0; i < N; i++)
+        {
+            for (int j = 0; j < N; j++)
+            {
+                if (!visited[i, j])
+                {
+                    List<(int, int)> currentUnion = new List<(int, int)>();
+                    Queue<(int, int)> queue = new Queue<(int, int)>();
+                    
+                    queue.Enqueue((i, j));
+                    visited[i, j] = true;
+                    currentUnion.Add((i, j));
+
+                    while (queue.Count > 0)
+                    {
+                        (int x, int y) current = queue.Dequeue();
+                        
+                        for (int k = 0; k < 4; k++)
+                        {
+                            int nx = current.x + dx[k];
+                            int ny = current.y + dy[k];
+                            
+                            if (nx < 0 || nx >= N || ny < 0 || ny >= N || visited[nx, ny])
+                                continue;
+
+                            if (ShouldOpenBorder(current.x, current.y, nx, ny))
+                            {
+                                visited[nx, ny] = true;
+                                queue.Enqueue((nx, ny));
+                                currentUnion.Add((nx, ny));
+                            }
+                        }
+                    }
+
+                    if (currentUnion.Count > 1)
+                    {
+                        allUnions.Add(currentUnion);
+                    }
+                }
+            }
+        }
+
+        if (allUnions.Count > 0)
+        {
+            movementOccurredThisDay = true;
+            foreach (var union in allUnions)
+            {
+                int totalPopulation = union.Sum(x => populationMap[x.Item1, x.Item2]);
+                int newPopulation = totalPopulation / union.Count;
+                
+                foreach (var (x, y) in union)
+                {
+                    populationMap[x, y] = newPopulation;
+                }
+            }
+        }
+        return movementOccurredThisDay;   
     }
 }
