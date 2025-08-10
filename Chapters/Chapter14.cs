@@ -53,3 +53,19 @@ public class Chapter14_1 : BaseClass
         }
     }
 }
+
+class Chapter14_2 : BaseClass
+{
+    protected override string SetTitle()
+    {
+        return "백준 18310 안테나";
+    }
+
+    protected override void Example()
+    {
+        int N = int.Parse(Console.ReadLine()!);
+        var list = Console.ReadLine()!.Split().Select(int.Parse).ToList();
+        var sortedList = list.OrderBy(t => t).ToList();
+        Console.WriteLine(sortedList[(N - 1)/ 2]);
+    }
+}
