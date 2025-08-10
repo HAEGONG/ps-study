@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Numerics;
+using System.Text;
 using ps_study;
 using ps_study.Chapters;
 
@@ -27,3 +28,5 @@ using ps_study.Chapters;
 // new Chapter13_5().Run();
 // new Chapter13_6().Run();
 // new Chapter13_7().Run();
+
+new CountingSort().Run();
