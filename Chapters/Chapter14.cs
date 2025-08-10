@@ -69,3 +69,36 @@ class Chapter14_2 : BaseClass
         Console.WriteLine(sortedList[(N - 1)/ 2]);
     }
 }
+
+class Chapter14_4 : BaseClass
+{
+    protected override string SetTitle()
+    {
+        return "백준 1715 카드 정렬하기";
+    }
+
+    protected override void Example()
+    {
+        int N = int.Parse(Console.ReadLine()!);
+
+        int result = 0;
+
+        PriorityQueue<int, int> queue = new PriorityQueue<int, int>(); 
+        for (int i = 0; i < N; i++)
+        {
+            int n = Convert.ToInt32(Console.ReadLine()!);
+            queue.Enqueue(n, n);
+        }
+
+        while (queue.Count > 1)
+        {
+            int a = queue.Dequeue();
+            int b = queue.Dequeue();
+            result = result + a + b;
+            queue.Enqueue(a + b, a + b);
+        }
+
+
+        Console.WriteLine(result);
+    }
+}
