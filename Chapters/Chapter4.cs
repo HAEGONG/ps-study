@@ -267,4 +267,83 @@ namespace ps_study.Chapters
             Console.WriteLine(countSec);
         }
     }
+    
+    class Chapter12_7 : BaseClass
+    {
+        private int N;
+        private int M;
+        private int[,] map;
+        private List<(int, int)> homes = new List<(int, int)>();
+        private List<(int, int)> chickens = new List<(int, int)>();
+        private Stack<(int, int)> stack = new Stack<(int, int)>();
+
+        private int result = int.MaxValue;
+
+        protected override string SetTitle()
+        {
+            return "백준 15686 치킨 배달";
+        }
+
+        protected override void Example()
+        {
+            int[] NM = Console.ReadLine()!.Split().Select(int.Parse).ToArray();
+            N = NM[0];
+            M = NM[1];
+            map = new int[N + 1, N + 1];
+
+            for (int i = 1; i <= N; i++)
+            {
+                int[] input = Console.ReadLine()!.Split().Select(int.Parse).ToArray();
+
+                for (int j = 0; j < input.Length; j++)
+                {
+                    map[i, j + 1] = input[j];
+                    if (input[j] == 1)
+                        homes.Add((i, j));
+                    else if (input[j] == 2)
+                        chickens.Add((i, j));
+                }
+            }
+            
+            SelectChicken(0);
+            
+            Console.WriteLine(result);
+        }
+
+        void SelectChicken( int startPoint)
+        {
+            if (stack.Count == M)
+            {
+                List<(int, int)> selectedChicken = stack.ToList();
+                int allChickenDist = 0;
+                foreach (var home in homes)
+                {
+                    int nearChickenDist = int.MaxValue;
+                    foreach (var chicken in selectedChicken)
+                    {
+                        nearChickenDist = Math.Min(nearChickenDist, CalChickenDistance(home, chicken));
+                    }
+                    allChickenDist = allChickenDist + nearChickenDist;
+                }
+                
+                result = Math.Min(result, allChickenDist);
+                
+                return;
+            }
+
+            for (int i = startPoint; i < chickens.Count; i++)
+            {
+                stack.Push(chickens[i]);
+                SelectChicken(i + 1);
+                stack.Pop();
+            }
+        }
+
+        int CalChickenDistance((int, int) home, (int, int) chicken)
+        {
+            int x = Math.Abs(home.Item1 - chicken.Item1);
+            int y = Math.Abs(home.Item2 - chicken.Item2);
+            return x + y;
+        }
+    }
 }
